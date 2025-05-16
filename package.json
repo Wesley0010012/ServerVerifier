@@ -8,5 +8,10 @@
   "keywords": [],
   "author": "Wesley Gabriel Laurindo",
   "license": "MIT",
-  "description": "Node JS Server Verifier"
+  "description": "Node JS Server Verifier",
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
 }

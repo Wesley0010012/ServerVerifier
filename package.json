@@ -17,6 +17,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "project-custom-errors": "^1.0.2",
     "ts-jest": "^29.3.4"
   }
 }

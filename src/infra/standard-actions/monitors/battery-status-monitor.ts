@@ -19,7 +19,7 @@ export class BatteryStatusMonitor extends NotifiableStandardAction {
   protected async getUsage(): Promise<Usage> {
     try {
       const battery = await si.battery()
-      return new Usage(100, 100 - (battery.percent || 0)) // usado = % drenada
+      return new Usage(100, 100 - (battery.percent || 0))
     } catch {
       throw new InternalError('Cannot access battery status information')
     }

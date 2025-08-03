@@ -1,6 +1,6 @@
 import { Usage } from '@/domain/entities/usage'
 import { InternalError } from 'project-custom-errors'
-import { NotifiableStandardAction } from '@/application/notifiable-standard-action'
+import { NotifiableStandardAction } from '@/application/standard-actions/notifiable-standard-action'
 import { totalmem, freemem } from 'os'
 import { StandardAction } from '@/domain/protocols/standard-action'
 

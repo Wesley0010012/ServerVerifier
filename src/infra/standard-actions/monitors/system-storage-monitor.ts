@@ -2,7 +2,7 @@ import { Usage } from '@/domain/entities/usage'
 import os from 'os'
 import disk from 'diskusage'
 import { InternalError } from 'project-custom-errors'
-import { NotifiableStandardAction } from '@/application/notifiable-standard-action'
+import { NotifiableStandardAction } from '@/application/standard-actions/notifiable-standard-action'
 import { StandardAction } from '@/domain/protocols/standard-action'
 
 export class DiskUsageSystemStorageMonitor extends NotifiableStandardAction {

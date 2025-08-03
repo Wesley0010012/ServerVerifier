@@ -1,3 +1,4 @@
+import { MemoryUsage } from '@/domain/entities/memory-usage'
 import { Usage } from '@/domain/entities/usage'
 import { StandardAction } from '@/domain/protocols/standard-action'
 
@@ -14,15 +15,17 @@ export abstract class NotifiableStandardAction
   ) {}
 
   protected async notifyUsage(usage: Usage): Promise<void> {
-    if (this.hasPassedInterval(this.latestNotification)) {
-      await this.messageNotifier.process(
-        `${this.actionName} limit is Exceeded: ${usage.getFree()} (${usage
-          .getInGB()
-          .toFixed(2)}GB) - ${usage.getPercentage().toFixed(2)}%`
-      )
+    if (!this.hasPassedInterval(this.latestNotification)) return
 
-      this.latestNotification = new Date()
-    }
+    const free = usage.getFree()
+    const percentage = usage.getPercentage().toFixed(2)
+    const inGB =
+      usage instanceof MemoryUsage ? ` (${usage.getInGB().toFixed(2)}GB)` : ''
+
+    const message = `${this.actionName} limit is Exceeded: ${free}${inGB} - ${percentage}%`
+
+    await this.messageNotifier.process(message)
+    this.latestNotification = new Date()
   }
 
   private hasPassedInterval(date: Date): boolean {
@@ -32,8 +35,8 @@ export abstract class NotifiableStandardAction
 
     const now = new Date()
     const diffInMs = now.getTime() - date.getTime()
-    const diffInDays = diffInMs / 86400000
-    return diffInDays > this.notificationInterval
+    const diffInSeconds = diffInMs / 60
+    return diffInSeconds > this.notificationInterval
   }
 
   protected abstract getUsage(): Promise<Usage>

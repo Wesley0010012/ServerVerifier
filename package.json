@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "diskusage": "^1.2.0",
+    "dotenv": "^17.2.1",
     "os": "^0.1.2",
     "project-custom-errors": "^1.0.2",
     "systeminformation": "^5.27.7",

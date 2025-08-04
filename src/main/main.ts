@@ -1,5 +1,8 @@
 import { parentPort } from 'worker_threads'
 import { ServerVerifierFactory } from './factories/server-verifier-factory'
+import { config } from 'dotenv'
+
+config()
 
 const controller = ServerVerifierFactory.build()
 

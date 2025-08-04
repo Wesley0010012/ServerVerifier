@@ -3,6 +3,7 @@ import { InternalError } from 'project-custom-errors'
 import { NotifiableStandardAction } from '@/application/standard-actions/notifiable-standard-action'
 import { totalmem, freemem } from 'os'
 import { StandardAction } from '@/domain/protocols/standard-action'
+import { MemoryUsage } from '@/domain/entities/memory-usage'
 
 export class SystemMemoryMonitor extends NotifiableStandardAction {
   public constructor(messageNotifier: StandardAction<string, void>) {
@@ -22,7 +23,7 @@ export class SystemMemoryMonitor extends NotifiableStandardAction {
       const freeMem = freemem()
       const usedMem = totalMem - freeMem
 
-      return new Usage(totalMem, usedMem)
+      return new MemoryUsage(totalMem, usedMem)
     } catch (err) {
       throw new InternalError('Cannot access memory usage information')
     }

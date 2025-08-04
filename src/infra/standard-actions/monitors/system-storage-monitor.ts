@@ -4,6 +4,7 @@ import disk from 'diskusage'
 import { InternalError } from 'project-custom-errors'
 import { NotifiableStandardAction } from '@/application/standard-actions/notifiable-standard-action'
 import { StandardAction } from '@/domain/protocols/standard-action'
+import { MemoryUsage } from '@/domain/entities/memory-usage'
 
 export class DiskUsageSystemStorageMonitor extends NotifiableStandardAction {
   public constructor(messageNotifier: StandardAction<string, void>) {
@@ -21,7 +22,7 @@ export class DiskUsageSystemStorageMonitor extends NotifiableStandardAction {
     try {
       const path = os.platform() === 'win32' ? 'C:' : '/'
       const info = disk.checkSync(path)
-      return new Usage(info.total, info.total - info.free)
+      return new MemoryUsage(info.total, info.total - info.free)
     } catch (err) {
       throw new InternalError('Cannot access disk storage information')
     }

@@ -9,20 +9,25 @@ import { SwapUsageMonitor } from '@/infra/standard-actions/monitors/swap-usage-m
 import { SystemLoadMonitor } from '@/infra/standard-actions/monitors/system-load-monitor'
 import { SystemMemoryMonitor } from '@/infra/standard-actions/monitors/system-memory-monitor'
 import { DiskUsageSystemStorageMonitor } from '@/infra/standard-actions/monitors/system-storage-monitor'
+import { monitorsEnvironment } from './config/environment/monitors-environment'
+import { getValidatedEnv } from './utils/env-validation'
+import { BaseEnvSpec } from './config/environment/environment'
+import { MonitorTypeEnum } from '@/infra/standard-actions/monitors/monitor-types-enum'
+import { MessageNotifierDispatcherFactory } from './message-notifier-dispatcher-factory'
 
 export class ServerVerifierFactory {
   private static readonly monitors: Record<
-    string,
+    MonitorTypeEnum,
     new (notifier: ConsoleLogMessageNotifier) => StandardAction<void, void>
   > = {
-    STORAGE_CHECK: DiskUsageSystemStorageMonitor,
-    FILE_SYSTEM_HEATH: FileSystemHealthMonitor,
-    NETWORK_USAGE: NetworkUsageMonitor,
-    SWAP_USAGE: SwapUsageMonitor,
-    BATTERY_STATUS: BatteryStatusMonitor,
-    MEMORY_CHECK: SystemMemoryMonitor,
-    SYSTEM_LOAD: SystemLoadMonitor,
-    CPU_CHECK: OsCpuMonitor
+    [MonitorTypeEnum.STORAGE_CHECK]: DiskUsageSystemStorageMonitor,
+    [MonitorTypeEnum.FILE_SYSTEM_HEALTH]: FileSystemHealthMonitor,
+    [MonitorTypeEnum.NETWORK_USAGE]: NetworkUsageMonitor,
+    [MonitorTypeEnum.SWAP_USAGE]: SwapUsageMonitor,
+    [MonitorTypeEnum.BATTERY_STATUS]: BatteryStatusMonitor,
+    [MonitorTypeEnum.MEMORY_CHECK]: SystemMemoryMonitor,
+    [MonitorTypeEnum.SYSTEM_LOAD]: SystemLoadMonitor,
+    [MonitorTypeEnum.CPU_CHECK]: OsCpuMonitor
   }
 
   private static buildMonitors(
@@ -30,16 +35,24 @@ export class ServerVerifierFactory {
   ): StandardAction<void, void>[] {
     return Object.entries(this.monitors)
       .filter(([envKey]) => process.env[envKey] === 'true')
-      .map(([_, MonitorClass]) => new MonitorClass(messageNotifier))
+      .map(([envKey, MonitorClass]) => {
+        monitorsEnvironment[envKey].map((env: BaseEnvSpec) => {
+          getValidatedEnv(env.key, env.type)
+        })
+
+        return new MonitorClass(messageNotifier)
+      })
   }
 
   public static build(): ServerVerifierController {
-    const messageNotifier = new ConsoleLogMessageNotifier()
+    const messageNotifier = MessageNotifierDispatcherFactory.build()
+
+    const monitorTimeout = getValidatedEnv('MONITOR_TIMEOUT_MS', 'number')
 
     return new ServerVerifierController(
       this.buildMonitors(messageNotifier),
       messageNotifier,
-      Number.parseInt(process.env.MONITOR_TIMEOUT_MS ?? '1')
+      monitorTimeout
     )
   }
 }

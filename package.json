@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest --passWithNoTests --runInBand --no-cache",
-    "start": "ts-node -r tsconfig-paths/register ./src/main/main.ts"
+    "start": "ts-node -r tsconfig-paths/register ./src/main/main.ts",
+    "deploy:start": "npm run build && pm2 start ./deploy/pm2/ecosystem.config.js",
+    "deploy:kill": "pm2 stop monitor-app && pm2 delete monitor-app"
   },
   "keywords": [],
   "author": "Wesley Gabriel Laurindo",
@@ -21,6 +24,7 @@
     "diskusage": "^1.2.0",
     "dotenv": "^17.2.1",
     "os": "^0.1.2",
+    "pm2": "^6.0.8",
     "project-custom-errors": "^1.0.2",
     "systeminformation": "^5.27.7",
     "ts-jest": "^29.3.4",
